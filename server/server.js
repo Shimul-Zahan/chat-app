@@ -7,6 +7,7 @@ const cors = require('cors');
 const { default: mongoose } = require('mongoose');
 const userRoutes = require('./routes/userRoute')
 const chatRoutes = require('./routes/chatRoutes')
+const messageRoutes = require('./routes/messageRoutes')
 
 app.use(cors());
 app.use(express.json());
@@ -27,7 +28,8 @@ app.get('/api/chat/:id', (req, res) => {
 })
 
 app.use('/api/user', userRoutes)
-app.use('/api/chats', chatRoutes)
+app.use('/api/chat', chatRoutes)
+app.use('/api/messages', messageRoutes)
 
 
 const connectDB = async () => {

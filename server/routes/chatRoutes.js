@@ -1,11 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const { createChat, findChat, userChats } = require('../controllers/chatController');
+const router = express.Router()
 
-// router.route('/chat').post(createChat)
-// router.route('/chat').get(getAllChats)
-// router.route('/group').post(createGroupChat)
-// router.route('/rename').patch(renameGroup)
-// router.route('/groupUpdate').patch(groupUpdate)
-// router.route('/groupAdd').patch(addToGroup)
+router.post('/create-chat', createChat);
+router.get('/create-chat/:userId', userChats);
+router.get('/find/:firstId/:secondId', findChat);
 
 module.exports = router

@@ -1,25 +1,21 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-
-const messageModel = mongoose.Schema(
+const MessageSchema = new mongoose.Schema(
     {
-        sender: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        },
-        content: {
+        chatId: {
             type: String,
-            trim: true
         },
-        chat: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Chat"
+        senderId: {
+            type: String,
+        },
+        text: {
+            type: String,
         },
     },
     {
         timestamps: true,
     }
-)
+);
 
-const Message = mongoose.model("Message", messageModel);
-module.exports = Message;
+const MessageModel = mongoose.model("Message", MessageSchema);
+module.exports = MessageModel

@@ -4,7 +4,7 @@ function App() {
 
   return (
     <section>
-      <h1>Hello World</h1>
+      <h1>Chat Page</h1>
     </section>
   )
 }
