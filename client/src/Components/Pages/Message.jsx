@@ -30,9 +30,7 @@ const Message = ({ currentUser, reciever, socket }) => {
   // Listen for incoming messages from Socket.io
   useEffect(() => {
     socket.current?.on('receive-message', (data) => {
-      console.log('Received message:', data);
       setMessages(prevMessages => [...prevMessages, data]);
-      console.log(messages);
     });
   }, [socket]);
 
