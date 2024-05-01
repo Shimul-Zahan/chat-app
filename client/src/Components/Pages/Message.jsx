@@ -12,7 +12,6 @@ const Message = ({ currentUser, reciever, socket }) => {
   const [hasMessages, setHasMessages] = useState(false);
   const [image, setImage] = useState('');
 
-
   // State to track if there are messages
   useEffect(() => {
     fetchData();
@@ -20,7 +19,7 @@ const Message = ({ currentUser, reciever, socket }) => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/messages/message/${reciever._id}`);
+      const res = await axios.get(`http://localhost:5000/api/messages/message/${reciever._id}/${currentUser?._id}`);
       setMessages(res.data);
       setHasMessages(res.data.length > 0); // Update hasMessages state based on message data
     } catch (error) {
@@ -28,23 +27,32 @@ const Message = ({ currentUser, reciever, socket }) => {
     }
   }
 
+  // Listen for incoming messages from Socket.io
+  useEffect(() => {
+    socket.current?.on('receive-message', (data) => {
+      console.log('Received message:', data);
+      setMessages(prevMessages => [...prevMessages, data]);
+      console.log(messages);
+    });
+  }, [socket]);
+
+
   useEffect(() => {
     fetchData();
   }, [reciever])
 
-  console.log(reciever);
 
   const sendMessage = async () => {
     try {
-      // socket.current.emit('send-message', {
-      //   senderId: currentUser?._id,
-      //   recieverId: reciever?._id,
-      //   time: new Date(),
-      //   text: {
-      //     message: newMessage,
-      //     image: image,
-      //   }
-      // })
+      socket.current.emit('send-message', {
+        senderId: currentUser._id,
+        recieverId: reciever._id,
+        text: {
+          message: newMessage,
+          image: image,
+        },
+        time: new Date(),
+      })
       await axios.post('http://localhost:5000/api/messages/message', {
         senderId: currentUser._id,
         recieverId: reciever._id,
@@ -65,6 +73,8 @@ const Message = ({ currentUser, reciever, socket }) => {
   const handleEmojiSelect = (emoji) => {
     setInputMessage(inputMessage + emoji.native);
   }
+
+  console.log(messages);
 
   return (
     <div className='p-4 h-screen overflow-y-scroll'>
@@ -96,10 +106,10 @@ const Message = ({ currentUser, reciever, socket }) => {
           {messages.map((message, idx) => (
             <div
               key={idx}
-              className={`${message.senderId === currentUser ? "self-end bg-blue-500 text-white" : "self-start bg-blue-400"
+              className={`${message.senderId === currentUser._id ? "self-end bg-blue-500 text-white" : "self-start bg-blue-400"
                 } p-4 rounded-lg max-w-xs`}
             >
-              <p className="text-sm">{message.text}</p>
+              <p className="text-sm">{message?.text?.message}</p>
               <p className="text-xs text-gray-600 text-end">{timeago.format(message.createdAt)}</p>
             </div>
           ))}

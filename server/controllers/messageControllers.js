@@ -20,9 +20,15 @@ const addMessage = async (req, res) => {
 };
 
 const getMessages = async (req, res) => {
-    const { chatId } = req.params;
+    const { recieverId, senderId } = req.params;
+    console.log(recieverId, senderId);
     try {
-        const result = await MessageModel.find({ chatId });
+        const result = await MessageModel.find({
+            $or: [
+                { recieverId, senderId },
+                { recieverId: senderId, senderId: recieverId }
+            ]
+        });
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json(error);

@@ -5,7 +5,6 @@ import { io } from 'socket.io-client'
 
 const Chat = () => {
 
-    const [clickUser, setClickUser] = useState('');
     const [users, setUsers] = useState([])
     const [reciever, setReciever] = useState([])
     const [onlineUsers, setOnlineUsers] = useState([])
@@ -29,7 +28,7 @@ const Chat = () => {
 
     // socket e data pathabo
     useEffect(() => {
-        socket.current.emit('addActiveUser', userInfo, users);
+        socket.current.emit('addActiveUser', userInfo._id);
     }, [])
 
     // get active user
@@ -38,7 +37,6 @@ const Chat = () => {
             setOnlineUsers(activeUsers);
         });
     }, [])
-
 
     const fetchData = async () => {
         const res = await axios.get(`http://localhost:5000/api/chat/create-chat/${userInfo}`);
@@ -52,9 +50,10 @@ const Chat = () => {
 
     const allUsers = users?.filter(user => user._id !== userInfo._id)
 
+    const online = users?.map(user => console.log(user?._id))
+
     return (
         <div>
-            <h1 className='bg-black text-white py-5 text-center text-3xl'>Chat Page</h1>
             <div>
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-5 lg:gap-1">
                     <div className="h-screen rounded-lg  p-2">
@@ -71,7 +70,9 @@ const Chat = () => {
                                     <img src={chat.image} alt="" className='w-12 h-12 rounded-full' />
                                     <div>
                                         <h1 className='text-base font-bold capitalize'>{chat.name}</h1>
-                                        <p className='text-xs text-green-600'>Online</p>
+                                        <p className={`text-xs ${onlineUsers.includes(chat._id) ? 'text-green-600' : 'text-red-600'}`}>
+                                            {onlineUsers?.includes(chat._id) ? 'Online' : 'Offline'}
+                                        </p>
                                     </div>
                                 </li>
                             )

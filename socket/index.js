@@ -7,13 +7,20 @@ const io = require("socket.io")(8000, {
 
 let activeUsers = [];
 
-const addUser = (userId, socketId, info) => {
+const addUser = (userId, socketId) => {
+    console.log(activeUsers);
     const checkUser = activeUsers.some(user => user.userId === userId);
+    console.log(checkUser, 'checkUser');
     if (!checkUser) {
-        activeUsers.push({ userId, socketId, info })
+        console.log(userId, socketId);
+        activeUsers.push({ userId, socketId })
+        console.log(activeUsers);
     }
-    console.log({ userId, socketId, info });
 }
+
+// const sendMessageToReciver = () => {
+//     console.log(activeUsers, 'from send message');
+// }
 
 const userRemove = (socketId) => {
     activeUsers = activeUsers.filter(user => user.socketId !== socketId);
@@ -21,45 +28,17 @@ const userRemove = (socketId) => {
 
 
 io.on("connection", (socket) => {
-    socket.on('addActiveUser', ((userId, userInfo) => {
-        addUser(userId, socket.id, userInfo);
+    socket.on('addActiveUser', ((userId) => {
+        console.log(userId);
+        addUser(userId, socket.id);
         io.emit('getActiveUser', activeUsers);
     }))
     socket.on('send-message', (data) => {
-        console.log(data);
+        // sendMessageToReciver(data)
+        io.emit('receive-message', data);
     })
     socket.on('disconnect', () => {
         userRemove(socket.id)
         io.emit('getActiveUser', activeUsers);
     })
-    console.log('socket is connected');
 });
-
-// socket.on("new-user-add", (newUserId) => {
-//     // if user is not added previou sly
-//     if (!activeUsers.some((user) => user.userId === newUserId)) {
-//         activeUsers.push({ userId: newUserId, socketId: socket.id });
-//         console.log("New User Connected", activeUsers);
-//     }
-//     // send all active users to new user
-//     io.emit("get-users", activeUsers);
-// });
-
-// socket.on("disconnect", () => {
-//     // remove user from active users
-//     activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
-//     console.log("User Disconnected", activeUsers);
-//     // send all active users to all users
-//     io.emit("get-users", activeUsers);
-// });
-
-// // send message to a specific user
-// socket.on("send-message", (data) => {
-//     const { receiverId } = data;
-//     const user = activeUsers.find((user) => user.userId === receiverId);
-//     console.log("Sending from socket to :", receiverId)
-//     console.log("Data: ", data)
-//     if (user) {
-//         io.to(user.socketId).emit("recieve-message", data);
-//     }
-// });
