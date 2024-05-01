@@ -8,9 +8,9 @@ const Chat = () => {
     const [users, setUsers] = useState([])
     const [reciever, setReciever] = useState([])
     const [onlineUsers, setOnlineUsers] = useState([])
-    const [sendMessage, setSendMessage] = useState(null);
-    const [recivedMessage, setRecivedMessage] = useState(null);
     const socket = useRef()
+
+    console.log(onlineUsers);
 
 
     const userInfoForChatApp = localStorage.getItem('userInfoForChatApp');
@@ -50,36 +50,43 @@ const Chat = () => {
 
     const allUsers = users?.filter(user => user._id !== userInfo._id)
 
-    const online = users?.map(user => console.log(user?._id))
 
     return (
         <div>
-            <div>
+            <div className='max-h-screen'>
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-5 lg:gap-1">
                     <div className="h-screen rounded-lg  p-2">
                         <li className='p-2 mb-10 my-2 text-xl bg-red-500 font-medium flex justify-start items-center gap-2 border border-black rounded-lg'>
                             <img src={userInfo?.image} alt="" className='w-12 h-12 rounded-full' />
-                            <div>
-                                <h1 className='text-base font-bold capitalize'>{userInfo?.name}</h1>
+                            <div className='text-white'>
+                                <h1 className='text-base font-bold capitalize '>{userInfo?.name}</h1>
                                 <p className='text-xs'>My Self</p>
                             </div>
                         </li>
                         {
                             allUsers && allUsers.map((chat, idx) =>
-                                <li onClick={() => setReciever(chat)} key={idx} className='p-2 my-2 cursor-pointer hover:shadow-lg text-xl font-medium flex justify-start items-center gap-2 border border-black rounded-lg'>
+                                <li onClick={() => setReciever(chat)} key={idx} className='p-2 relative my-2 cursor-pointer hover:shadow-lg text-xl font-medium flex justify-start items-center gap-2 border border-black rounded-lg'>
                                     <img src={chat.image} alt="" className='w-12 h-12 rounded-full' />
                                     <div>
                                         <h1 className='text-base font-bold capitalize'>{chat.name}</h1>
-                                        <p className={`text-xs ${onlineUsers.includes(chat._id) ? 'text-green-600' : 'text-red-600'}`}>
-                                            {onlineUsers?.includes(chat._id) ? 'Online' : 'Offline'}
-                                        </p>
+                                        {onlineUsers.some(user => user.userId === chat._id) ? (
+                                            <div className="flex items-center">
+                                                <span className="absolute bottom-4 left-12 w-2 h-2 rounded-full bg-green-700 mr-2"></span>
+                                                <p className="text-sm text-green-700">Online</p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center">
+                                                <span className="absolute bottom-4 left-12 w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                                                <p className="text-sm text-red-500">Offline</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </li>
                             )
                         }
                     </div>
-                    <div className="h-screen rounded-lg bg-gray-200 lg:col-span-4">
-                        <Message socket={socket} reciever={reciever} currentUser={userInfo} />
+                    <div className="h-screen rounded-lg lg:col-span-4">
+                        <Message socket={socket} reciever={reciever} currentUser={userInfo} onlineUsers={onlineUsers} />
                     </div>
                 </div>
             </div>
