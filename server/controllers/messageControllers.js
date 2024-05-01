@@ -1,11 +1,15 @@
 const MessageModel = require('../models/messageModel')
 
 const addMessage = async (req, res) => {
-    const { chatId, senderId, text } = req.body;
+    const { recieverId, senderId, text } = req.body;
+    console.log(text);
     const message = new MessageModel({
-        chatId,
         senderId,
-        text,
+        recieverId,
+        text: {
+            message: text.message,
+            image: text.image
+        }
     });
     try {
         const result = await message.save();

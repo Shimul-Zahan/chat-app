@@ -13,16 +13,18 @@ const createChat = async (req, res) => {
     }
 };
 
+
 const userChats = async (req, res) => {
     try {
-        const chat = await ChatModel.find({
+        const chats = await ChatModel.find({
             members: { $in: [req.params.userId] },
-        });
-        res.status(200).json(chat);
+        }).populate('members');
+        res.status(200).json(chats);
     } catch (error) {
         res.status(500).json(error);
     }
 };
+
 
 const findChat = async (req, res) => {
     try {

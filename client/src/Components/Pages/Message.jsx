@@ -3,22 +3,24 @@ import React, { useEffect, useState } from 'react';
 import * as timeago from 'timeago.js';
 import InputEmoji from "react-input-emoji";
 
-const Message = ({ data, currentUser, reciever }) => {
+const Message = ({ currentUser, reciever, socket }) => {
+
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [hasMessages, setHasMessages] = useState(false);
+  const [image, setImage] = useState('');
 
-  console.log(data);// State to track if there are messages
 
+  // State to track if there are messages
   useEffect(() => {
     fetchData();
-  }, [data?._id]);
+  }, []);
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/messages/message/${data._id}`);
+      const res = await axios.get(`http://localhost:5000/api/messages/message/${reciever._id}`);
       setMessages(res.data);
       setHasMessages(res.data.length > 0); // Update hasMessages state based on message data
     } catch (error) {
@@ -26,14 +28,30 @@ const Message = ({ data, currentUser, reciever }) => {
     }
   }
 
-  console.log(messages);
+  useEffect(() => {
+    fetchData();
+  }, [reciever])
+
+  console.log(reciever);
 
   const sendMessage = async () => {
     try {
+      // socket.current.emit('send-message', {
+      //   senderId: currentUser?._id,
+      //   recieverId: reciever?._id,
+      //   time: new Date(),
+      //   text: {
+      //     message: newMessage,
+      //     image: image,
+      //   }
+      // })
       await axios.post('http://localhost:5000/api/messages/message', {
-        senderId: currentUser,
-        chatId: data._id,
-        text: newMessage
+        senderId: currentUser._id,
+        recieverId: reciever._id,
+        text: {
+          message: newMessage,
+          image: image,
+        }
       });
       fetchData();
       setNewMessage('');
@@ -43,12 +61,13 @@ const Message = ({ data, currentUser, reciever }) => {
     }
   }
 
+
   const handleEmojiSelect = (emoji) => {
     setInputMessage(inputMessage + emoji.native);
   }
 
   return (
-    <div className='p-4'>
+    <div className='p-4 h-screen overflow-y-scroll'>
       <div className='shadow-lg rounded-xl flex justify-between items-center'>
         <div className='p-2 text-xl font-medium flex justify-start items-center gap-2 rounded-lg'>
           <img src={reciever?.image} alt="" className='w-12 h-12 rounded-full' />
@@ -92,7 +111,7 @@ const Message = ({ data, currentUser, reciever }) => {
       )}
 
       {/* for sending message */}
-      <div className="flex items-center lg:absolute lg:w-[77%] bottom-5 justify-between mt-4">
+      <div className="flex items-center justify-between mt-4">
         <button className='text-2xl font-bold px-8'>+</button>
         <div className="relative w-full">
           <InputEmoji

@@ -1,10 +1,12 @@
 const express = require('express');
-const { registerUser } = require('../controllers/userController');
+const { registerUser, loginUser, getAllUsers } = require('../controllers/userController');
 const User = require('../models/User');
 const router = express.Router();
 
 // router.route('/login').post(registerUser)
 router.route('/reg').post(registerUser)
+router.route('/login').post(loginUser)
+router.route('/all-users').get(getAllUsers)
 router.get('/:id', async (req, res) => {
     try {
         const userId = req.params.id;
