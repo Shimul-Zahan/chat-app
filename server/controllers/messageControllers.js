@@ -35,13 +35,15 @@ const addMessage = async (req, res) => {
     const receiver = await User.findById(recieverId);
     const new_reciever = await User.findByIdAndUpdate(recieverId, {
         lastMessage: text?.message || text?.message,
-        sender: sender.name
+        sender: sender.name,
+        messageSendTime: new Date()
     }, { new: true });
 
 
     const new_sender = await User.findByIdAndUpdate(senderId, {
         lastMessage: text?.message || text?.message,
-        sender: "me"
+        sender: "me",
+        messageSendTime: new Date()
     }, { new: true });
 
     const message = new MessageModel({

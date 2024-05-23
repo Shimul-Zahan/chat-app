@@ -22,10 +22,14 @@ const userModel = mongoose.Schema(
         },
         lastMessage: {
             type: String,
-            default: null, 
+            default: null,
         },
         sender: {
             type: String,
+            default: null
+        },
+        messageSendTime: {
+            type: Date,
             default: null
         },
     },

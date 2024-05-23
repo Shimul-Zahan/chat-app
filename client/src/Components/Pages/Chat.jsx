@@ -44,14 +44,7 @@ const Chat = () => {
             setOnlineUsers(activeUsers);
         });
     }, [])
-
-    // const fetchData = async () => {
-    //     const res = await axios.get(`http://localhost:5000/api/chat/create-chat/${userInfo}`);
-    //     setChats(res.data)
-    // }
-
     const allUsers = users?.filter(user => user._id !== userInfo._id)
-
 
     return (
         <div>
@@ -70,7 +63,17 @@ const Chat = () => {
                                 <li onClick={() => setReciever(chat)} key={idx} className='p-2 relative my-2 cursor-pointer hover:shadow-lg text-xl font-medium flex justify-start items-center gap-2 border border-black rounded-lg'>
                                     <img src={chat.image} alt="" className='w-12 h-12 rounded-full' />
                                     <div>
-                                        <h1 className='text-base font-bold capitalize'>{chat.name}</h1>
+                                        <div className='flex justify-between items-center w-[210px]'>
+                                            <h1 className='text-base font-bold capitalize'>{chat.name}</h1>
+                                            <p className="font-bold text-xs text-gray-600">{
+                                                chat?.messageSendTime
+                                                    ? new Date(chat?.messageSendTime).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })
+                                                    : ''
+                                            }</p>
+                                        </div>
                                         {onlineUsers.some(user => user.userId === chat._id) ? (
                                             <div className="flex items-center">
                                                 <span className="absolute bottom-4 left-12 w-2 h-2 rounded-full bg-green-700 mr-2"></span>
@@ -80,9 +83,11 @@ const Chat = () => {
                                                 <span className="absolute bottom-4 left-12 w-2 h-2 rounded-full bg-red-500 mr-2"></span>
                                             </div>
                                         )}
-                                        <div className='flex justify-start items-center gap-1'>
-                                            <p className="text-xs text-black font-bold">{chat?.sender && chat?.sender + ' :'}</p>
-                                            <p className="text-xs text-black">{chat?.lastMessage}</p>
+                                        <div className='flex justify-between w-full'>
+                                            <div className='flex justify-start items-center gap-1'>
+                                                <p className="text-xs text-black font-bold">{chat?.sender && chat?.sender + ' :'}</p>
+                                                <p className="text-xs text-black">{chat?.lastMessage}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
