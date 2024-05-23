@@ -10,7 +10,7 @@ import { FaPoll } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
 
 
-const Message = ({ currentUser, reciever, socket, onlineUsers }) => {
+const Message = ({ currentUser, reciever, socket, onlineUsers, setSendMessage }) => {
 
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -73,6 +73,7 @@ const Message = ({ currentUser, reciever, socket, onlineUsers }) => {
       });
       fetchData();
       setNewMessage('');
+      setSendMessage(true);
       console.log('message sent successfully');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -94,6 +95,7 @@ const Message = ({ currentUser, reciever, socket, onlineUsers }) => {
     try {
       const res = await axios.post('http://localhost:5000/api/messages/message', formData);
       if (res.data?.text?.image) {
+        setSendMessage(true);
         // send data to the socket io
         socket.current.emit('send-message', {
           senderId: currentUser._id,

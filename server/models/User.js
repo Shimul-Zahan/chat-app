@@ -20,6 +20,14 @@ const userModel = mongoose.Schema(
             required: true,
             default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
         },
+        lastMessage: {
+            type: String,
+            default: null, 
+        },
+        sender: {
+            type: String,
+            default: null
+        },
     },
     {
         timestamps: true,

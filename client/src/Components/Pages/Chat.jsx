@@ -8,19 +8,26 @@ const Chat = () => {
     const [users, setUsers] = useState([])
     const [reciever, setReciever] = useState([])
     const [onlineUsers, setOnlineUsers] = useState([])
+    const [sendMessage, setSendMessage] = useState(false);
     const socket = useRef()
-
-    console.log(onlineUsers);
-
 
     const userInfoForChatApp = localStorage.getItem('userInfoForChatApp');
     const userInfo = JSON.parse(userInfoForChatApp);
 
+    console.log(sendMessage);
+
 
     const getUsers = async () => {
         const res = await axios.get('http://localhost:5000/api/user/all-users');
+        console.log(res.data);
         setUsers(res.data);
+        setSendMessage(false);
     }
+
+    useEffect(() => {
+        // fetchData()
+        getUsers()
+    }, [sendMessage])
 
     useEffect(() => {
         socket.current = io('ws://localhost:8000');
@@ -38,15 +45,10 @@ const Chat = () => {
         });
     }, [])
 
-    const fetchData = async () => {
-        const res = await axios.get(`http://localhost:5000/api/chat/create-chat/${userInfo}`);
-        setChats(res.data)
-    }
-
-    useEffect(() => {
-        fetchData()
-        getUsers()
-    }, [])
+    // const fetchData = async () => {
+    //     const res = await axios.get(`http://localhost:5000/api/chat/create-chat/${userInfo}`);
+    //     setChats(res.data)
+    // }
 
     const allUsers = users?.filter(user => user._id !== userInfo._id)
 
@@ -54,8 +56,8 @@ const Chat = () => {
     return (
         <div>
             <div className='max-h-screen'>
-                <div className="grid grid-cols-1 gap-2 lg:grid-cols-5 lg:gap-1">
-                    <div className="h-screen rounded-lg  p-2">
+                <div className="grid gap-2 grid-cols-5 lg:gap-1">
+                    <div className="h-screen rounded-lg p-2 col-span-1">
                         <li className='p-2 mb-10 my-2 text-xl bg-red-500 font-medium flex justify-start items-center gap-2 border border-black rounded-lg'>
                             <img src={userInfo?.image} alt="" className='w-12 h-12 rounded-full' />
                             <div className='text-white'>
@@ -72,21 +74,23 @@ const Chat = () => {
                                         {onlineUsers.some(user => user.userId === chat._id) ? (
                                             <div className="flex items-center">
                                                 <span className="absolute bottom-4 left-12 w-2 h-2 rounded-full bg-green-700 mr-2"></span>
-                                                <p className="text-sm text-green-700">Online</p>
                                             </div>
                                         ) : (
                                             <div className="flex items-center">
                                                 <span className="absolute bottom-4 left-12 w-2 h-2 rounded-full bg-red-500 mr-2"></span>
-                                                <p className="text-sm text-red-500">Offline</p>
                                             </div>
                                         )}
+                                        <div className='flex justify-start items-center gap-1'>
+                                            <p className="text-xs text-black font-bold">{chat?.sender && chat?.sender + ' :'}</p>
+                                            <p className="text-xs text-black">{chat?.lastMessage}</p>
+                                        </div>
                                     </div>
                                 </li>
                             )
                         }
                     </div>
-                    <div className="h-screen rounded-lg lg:col-span-4">
-                        <Message socket={socket} reciever={reciever} currentUser={userInfo} onlineUsers={onlineUsers} />
+                    <div className="h-screen rounded-lg col-span-4">
+                        <Message setSendMessage={setSendMessage} socket={socket} reciever={reciever} currentUser={userInfo} onlineUsers={onlineUsers} />
                     </div>
                 </div>
             </div>

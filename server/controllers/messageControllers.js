@@ -1,6 +1,7 @@
 const MessageModel = require('../models/messageModel')
 const path = require('path');
 const multer = require('multer');
+const User = require('../models/User');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -28,12 +29,26 @@ const upload = multer({ storage });
 const addMessage = async (req, res) => {
     console.log('his this route');
     const { recieverId, senderId, text } = req.body;
-    console.log(recieverId, senderId, req.file?.filename);
+    // console.log(recieverId, senderId, req.file?.filename, text);
+
+    const sender = await User.findById(senderId);
+    const receiver = await User.findById(recieverId);
+    const new_reciever = await User.findByIdAndUpdate(recieverId, {
+        lastMessage: text?.message || text?.message,
+        sender: sender.name
+    }, { new: true });
+
+
+    const new_sender = await User.findByIdAndUpdate(senderId, {
+        lastMessage: text?.message || text?.message,
+        sender: "me"
+    }, { new: true });
+
     const message = new MessageModel({
         senderId,
         recieverId,
         text: {
-            message: text && text?.message ,
+            message: text && text?.message,
             image: req.file?.filename && req.file?.filename
         }
     });
